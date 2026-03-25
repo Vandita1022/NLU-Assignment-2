@@ -49,6 +49,8 @@ This repository contains the implementation for a two-part Natural Language Proc
     │   │   └── p2_task2.py
     │
     └── README.md
+    │
+    └── report.pdf
 
 ---
 
