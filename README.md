@@ -1,4 +1,4 @@
-# IIT Jodhpur NLP Assignment: Word Embeddings & Semantic Analysis
+# NLP Assignment: Word Embeddings & Semantic Analysis
 
 This repository contains the implementation for a two-part Natural Language Processing assignment.
 
