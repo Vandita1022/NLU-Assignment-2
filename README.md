@@ -1,149 +1,270 @@
 # IIT Jodhpur NLP Assignment: Word Embeddings & Semantic Analysis
 
-This repository contains the implementation for a two-part Natural Language Processing assignment.  
-**Problem 1** focuses on building a custom "Institutional" Word2Vec model by scraping data from IIT Jodhpur's digital infrastructure.
+This repository contains the implementation for a two-part Natural Language Processing assignment.
+
+- **Problem 1:** Institutional Word2Vec Model (IIT Jodhpur corpus)
+- **Problem 2:** Character-Level Indian Name Generation using RNN architectures
 
 ---
 
-## 📂 Project Structure
+# 📂 Project Structure
 
     .
     ├── Problem_1/
     │   ├── scripts/
-    │   │   ├── task1_scraper.py      # Web scraping, PDF extraction, & preprocessing
-    │   │   ├── task2_trainer.py      # Model training (36 variations) & performance viz
-    │   │   ├── task3_analysis.py     # Semantic analysis (Neighbors & Analogies)
-    │   │   └── task4_visualizer.py   # PCA dimensionality reduction & plotting
+    │   │   ├── task1_scraper.py
+    │   │   ├── task2_trainer.py
+    │   │   ├── task3_analysis.py
+    │   │   └── task4_visualizer.py
     │   ├── data/
-    │   │   ├── raw_pdfs/             # Source Academic Regulation PDFs
-    │   │   └── cleaned_corpus.txt    # Final preprocessed text for training
-    │   ├── trained_models/           # Storage for .model files (36 variations)
+    │   │   ├── raw_pdfs/
+    │   │   └── cleaned_corpus.txt
+    │   ├── trained_models/
     │   └── outputs/
-    │       ├── word_cloud.png        # Task 1: Dataset visualization
-    │       ├── task2_results.csv     # Task 2: Training time logs
-    │       ├── performance_viz.png   # Task 2: Efficiency comparison plot
-    │       └── cluster_viz.png       # Task 4: 2D PCA cluster comparison
-    └── Problem_2/
-        └── [Files for Problem 2 implementation]
+    │       ├── word_cloud.png
+    │       ├── task2_results.csv
+    │       ├── performance_viz.png
+    │       └── cluster_viz.png
+    │
+    ├── Problem_2/
+    │   ├── TrainingNames.txt
+    │   ├── vanilla_rnn.py
+    │   ├── blstm_model.py
+    │   ├── attention_gru.py
+    │   ├── p1_task2.py
+    │   └── results/
+    │
+    └── README.md
 
 ---
 
-## 🚀 Installation & Prerequisites
+# 🚀 Installation & Prerequisites
 
-To run these scripts, you will need **Python 3.8+** and the following libraries:
+Install required libraries:
 
-    pip install requests beautifulsoup4 pypdf2 nltk gensim pandas matplotlib seaborn scikit-learn wordcloud
+    pip install requests beautifulsoup4 pypdf2 nltk gensim pandas matplotlib seaborn scikit-learn wordcloud torch numpy
 
 ---
 
-## 🛠️ Execution Flow (Problem 1)
+# 🛠️ Problem 1: Institutional Word2Vec Model
 
-### 1. Dataset Preparation (`task1_scraper.py`)
+## 1. Dataset Preparation (`task1_scraper.py`)
 
 **Function:**  
-Crawls 20+ URLs from IIT Jodhpur and extracts text from localized Academic Regulation PDFs.
+Scrapes 20+ IIT Jodhpur webpages and extracts text from academic PDFs.
 
-**Cleaning Pipeline:**
-- Lowercase normalization  
-- Punctuation removal via regex (`[^a-z\s]`)  
-- Filters out words shorter than 3 characters  
+**Processing Pipeline:**
+- Lowercasing  
+- Regex cleaning (`[^a-z\s]`)  
+- Removing short tokens (<3 chars)  
+- Stopword removal (NLTK + custom list)
 
-**Stopwords:**
-- NLTK stopwords  
-- Custom noise list (e.g., *iit*, *jodhpur*)
-
-**Outcome:**
-- Corpus size: **31,460 tokens**  
-- Vocabulary size: **2,864 unique words**
+**Output:**
+- Tokens: **31,460**
+- Vocabulary: **2,864 words**
 
 ---
 
-### 2. Model Training (`task2_trainer.py`)
+## 2. Model Training (`task2_trainer.py`)
 
-**Function:**  
-Performs a grid search over **36 parameter combinations**
+**Grid Search (36 configs):**
+- Architectures: CBOW, Skip-gram  
+- Dimensions: 50, 100, 200  
+- Window sizes: 2, 5, 8  
+- Negative samples: 5, 10  
 
-**Variations:**
-- Architectures: **CBOW vs Skip-gram**  
-- Embedding Dimensions: **{50, 100, 200}**  
-- Context Windows: **{2, 5, 8}**  
-- Negative Samples: **{5, 10}**  
-
-**Outcome:**
-- Logs training time for efficiency analysis  
-- Saves all trained model variants  
+**Output:**
+- Saved models  
+- Training time logs  
+- Performance visualization  
 
 ---
 
-### 3. Semantic Analysis (`task3_analysis.py`)
+## 3. Semantic Analysis (`task3_analysis.py`)
 
-**Function:**  
-Evaluates the best Skip-gram model using **cosine similarity**
+**Techniques:**
+- Cosine similarity  
+- Nearest neighbors  
+- Word analogies  
 
-**Tasks:**
-- **Nearest Neighbors:** Top-5 similar words (e.g., *research*, *student*, *phd*)  
-- **Analogy Testing:** Vector arithmetic (**A:B :: C:?**)  
+**Example Result:**
 
-**Result Example:**
-
-    science : physics :: engineering : mechanical  (score: 0.9909)
+    science : physics :: engineering : mechanical  (0.9909)
 
 ---
 
-### 4. Cluster Visualization (`task4_visualizer.py`)
+## 4. PCA Visualization (`task4_visualizer.py`)
 
-**Function:**  
-Reduces 200D embeddings to 2D using PCA
-
-**Visualization:**
-- 25+ labeled words  
-- Categories: Departments, Admin, Degrees, etc.
+- Reduced 200D → 2D  
+- Plotted 25+ labeled words  
+- Category clusters (Departments, Admin, Degrees)
 
 **Observation:**
-- Skip-gram → tight, meaningful clusters  
-- CBOW → dispersed and less structured  
+- Skip-gram → clear clusters  
+- CBOW → scattered embeddings  
 
 ---
 
-## 📊 Summary of Problem 1 Results
+## 📊 Problem 1 Summary
 
-### 1. Training Efficiency
-- Skip-gram is computationally heavier than CBOW  
+### Training Efficiency
+- Skip-gram slower than CBOW  
 - Example (200D):
-  - Skip-gram: **1.28s**
-  - CBOW: **0.27s**
+  - Skip-gram: 1.28s  
+  - CBOW: 0.27s  
+
+### Semantic Quality
+- Captured institutional language:
+  - phd ↔ mtech  
+  - research ↔ development  
+
+- Analogy:
+  - faculty : research :: student : semesters  
+
+### Clustering
+- Skip-gram better for small datasets  
+- CBOW suffers from vector saturation  
 
 ---
 
-### 2. Semantic Integrity
-The model successfully captures institutional language:
+# 🧠 Problem 2: Character-Level Indian Name Generation
 
-- Structural:
-  - *phd ↔ mtech*
-  - *research ↔ development*
+## 📌 Overview
 
-- Regulatory:
-  - *faculty : research :: student : semesters*
+This task implements three recurrent neural architectures from scratch to generate Indian names at the character level using a dataset of 1,000 names.
 
 ---
 
-### 3. Clustering Behavior
-- Skip-gram performs better on small, domain-specific datasets  
-- Clear separation between:
-  - Academic concepts  
-  - Administrative roles  
+## 1. Dataset & Preprocessing
 
-- CBOW suffers from **vector saturation**
+**Steps:**
+- Character-level tokenization  
+- Special tokens:
+  - `<PAD>` = 0  
+  - `<SOS>`  
+  - `<EOS>`  
+
+- Lowercasing → vocabulary size **V = 29**  
+- Created:
+  - `stoi` (string → index)  
+  - `itos` (index → string)  
+
+- Padding:
+  - Used `pad_sequence` for batching  
 
 ---
 
-## 📝 Problem 2
+## 2. Model Architectures
 
-*(To be added — implementation details pending)*
+### A. Vanilla RNN
+
+**Logic:**
+
+    h_t = tanh(x_t W_ih + b_ih + h_{t-1} W_hh + b_hh)
+
+- Parameters: ~40,477  
+- Role: Baseline memorization model  
 
 ---
 
-## 👤 Author
+### B. Bidirectional LSTM (BLSTM)
+
+- Custom LSTM cell (Input, Forget, Cell, Output gates)  
+- Forward + backward pass  
+
+**Representation:**
+- 128D forward + 128D backward → 256D  
+
+- Parameters: ~275,357  
+- Role: Captures global structure  
+
+---
+
+### C. RNN with Causal Attention (GRU + Attention)
+
+- Bahdanau-style additive attention  
+- Computes context vector over past hidden states  
+
+**Sampling Techniques:**
+- Temperature scaling: T = 1.1  
+- Top-K sampling: K = 5  
+
+- Parameters: ~27,518  
+- Role: Phonetic generalization  
+
+---
+
+## 3. Quantitative Results
+
+| Model            | Novelty (%) | Diversity |
+|------------------|------------|----------|
+| Vanilla RNN      | 11.00%     | 0.98     |
+| BLSTM            | 100.00%    | 1.00     |
+| Attention GRU    | 17.00%     | 0.86     |
+
+---
+
+## 4. Qualitative Observations
+
+### Vanilla RNN
+- High realism  
+- Heavy memorization  
+- Behaves like lookup table  
+
+### BLSTM
+- Overfits  
+- "Stuttering" issue  
+  - Example: `aazosnhhaal`  
+
+### Attention GRU
+- Best balance  
+- Generates realistic new names:
+  - `Xavikrat`  
+  - `Bhumakin`  
+
+---
+
+## 5. How to Run
+
+### Requirements
+
+- Python 3.10+  
+- PyTorch  
+- NumPy  
+
+---
+
+### Run Models
+
+    # Vanilla RNN
+    python vanilla_rnn.py
+
+    # BLSTM
+    python blstm_model.py
+
+    # Attention GRU
+    python attention_gru.py
+
+---
+
+### Evaluation
+
+    python p1_task2.py
+
+---
+
+## 📂 Problem 2 Structure
+
+    ├── TrainingNames.txt
+    ├── vanilla_rnn.py
+    ├── blstm_model.py
+    ├── attention_gru.py
+    ├── p1_task2.py
+    └── results/
+
+---
+
+# 👤 Author
 
 **Vandita Gupta**  
 Pre-final year Undergraduate  
