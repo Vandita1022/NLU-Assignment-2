@@ -10,29 +10,43 @@ This repository contains the implementation for a two-part Natural Language Proc
 # 📂 Project Structure
 
     .
-    ├── Problem_1/
-    │   ├── scripts/
-    │   │   ├── task1_scraper.py
-    │   │   ├── task2_trainer.py
-    │   │   ├── task3_analysis.py
-    │   │   └── task4_visualizer.py
+    ├── question1/
     │   ├── data/
-    │   │   ├── raw_pdfs/
-    │   │   └── cleaned_corpus.txt
-    │   ├── trained_models/
-    │   └── outputs/
-    │       ├── word_cloud.png
-    │       ├── task2_results.csv
-    │       ├── performance_viz.png
-    │       └── cluster_viz.png
+    │   │   ├── corpus.txt
+    │   │   └── raw_corpus.txt
+    │   │
+    │   ├── outputs/
+    │   │   ├── task2_experiment_results.csv
+    │   │   ├── task2_performance_visualization.png
+    │   │   ├── task4_clusters_comparison.png
+    │   │   └── word_cloud.png
+    │   │
+    │   ├── scripts/
+    │   │   ├── p1_task1.py
+    │   │   ├── p1_task2.py
+    │   │   ├── p1_task3.py
+    │   │   └── p1_task4.py
+    │   │
+    │   └── trained_models/
+    │       ├── cbow_d50_w2_n5.model
+    │       ├── ... (all 36 models)
     │
-    ├── Problem_2/
-    │   ├── TrainingNames.txt
-    │   ├── vanilla_rnn.py
-    │   ├── blstm_model.py
-    │   ├── attention_gru.py
-    │   ├── p1_task2.py
-    │   └── results/
+    ├── question2/
+    │   ├── data/
+    │   │   └── TrainingNames.txt
+    │   │
+    │   ├── outputs/
+    │   │   ├── attention_generated.txt
+    │   │   ├── blstm_generated.txt
+    │   │   ├── vanilla_generated.txt
+    │   │   └── name_analysis.png
+    │   │
+    │   ├── scripts/
+    │   │   ├── attention.py
+    │   │   ├── BLSTM.py
+    │   │   ├── VanillaRNN.py
+    │   │   ├── name_analysis.py
+    │   │   └── p2_task2.py
     │
     └── README.md
 
@@ -40,7 +54,7 @@ This repository contains the implementation for a two-part Natural Language Proc
 
 # 🚀 Installation & Prerequisites
 
-Install required libraries:
+Install all required dependencies:
 
     pip install requests beautifulsoup4 pypdf2 nltk gensim pandas matplotlib seaborn scikit-learn wordcloud torch numpy
 
@@ -48,153 +62,167 @@ Install required libraries:
 
 # 🛠️ Problem 1: Institutional Word2Vec Model
 
-## 1. Dataset Preparation (`task1_scraper.py`)
+## 📌 Overview
 
-**Function:**  
-Scrapes 20+ IIT Jodhpur webpages and extracts text from academic PDFs.
+![Word Cloud](question1/outputs/word_cloud.png)
 
-**Processing Pipeline:**
-- Lowercasing  
-- Regex cleaning (`[^a-z\s]`)  
-- Removing short tokens (<3 chars)  
-- Stopword removal (NLTK + custom list)
-
-**Output:**
-- Tokens: **31,460**
-- Vocabulary: **2,864 words**
+Build a domain-specific Word2Vec model using IIT Jodhpur data (web + PDFs), and analyze semantic relationships.
 
 ---
 
-## 2. Model Training (`task2_trainer.py`)
+## ⚙️ How to Run (Step-by-Step)
 
-**Grid Search (36 configs):**
-- Architectures: CBOW, Skip-gram  
-- Dimensions: 50, 100, 200  
-- Window sizes: 2, 5, 8  
-- Negative samples: 5, 10  
+### Step 1: Data Collection & Preprocessing
 
-**Output:**
-- Saved models  
-- Training time logs  
-- Performance visualization  
+    cd question1/scripts
+    python p1_task1.py
+
+✔ Generates:
+- `corpus.txt`
+- `word_cloud.png`
 
 ---
 
-## 3. Semantic Analysis (`task3_analysis.py`)
+### Step 2: Train Models (36 combinations)
 
-**Techniques:**
-- Cosine similarity  
-- Nearest neighbors  
-- Word analogies  
+    python p1_task2.py
 
-**Example Result:**
-
-    science : physics :: engineering : mechanical  (0.9909)
+✔ Generates:
+- Models in `trained_models/`
+- `task2_experiment_results.csv`
+- `task2_performance_visualization.png`
 
 ---
 
-## 4. PCA Visualization (`task4_visualizer.py`)
+### Step 3: Semantic Analysis
 
-- Reduced 200D → 2D  
-- Plotted 25+ labeled words  
-- Category clusters (Departments, Admin, Degrees)
+    python p1_task3.py
 
-**Observation:**
-- Skip-gram → clear clusters  
-- CBOW → scattered embeddings  
+✔ Performs:
+- Nearest neighbors
+- Analogies
 
 ---
 
-## 📊 Problem 1 Summary
+### Step 4: PCA Visualization
+
+    python p1_task4.py
+
+✔ Generates:
+- `task4_clusters_comparison.png`
+
+---
+
+## 📊 Key Results
 
 ### Training Efficiency
+
+![Performance](question1/outputs/task2_performance_visualization.png)
+
 - Skip-gram slower than CBOW  
 - Example (200D):
   - Skip-gram: 1.28s  
-  - CBOW: 0.27s  
+  - CBOW: 0.27s
 
-### Semantic Quality
-- Captured institutional language:
-  - phd ↔ mtech  
-  - research ↔ development  
+---
+
+### Semantic Understanding
+
+![Clusters](question1/outputs/task4_clusters_comparison.png)
+
+- phd ↔ mtech  
+- research ↔ development  
 
 - Analogy:
-  - faculty : research :: student : semesters  
+    faculty : research :: student : semesters  
+
+---
 
 ### Clustering
-- Skip-gram better for small datasets  
-- CBOW suffers from vector saturation  
+- Skip-gram → tight clusters  
+- CBOW → scattered embeddings  
 
 ---
 
 # 🧠 Problem 2: Character-Level Indian Name Generation
 
 ## 📌 Overview
-
-This task implements three recurrent neural architectures from scratch to generate Indian names at the character level using a dataset of 1,000 names.
+Generate Indian names using 3 architectures:
+- Vanilla RNN  
+- Bidirectional LSTM  
+- Attention-based GRU  
 
 ---
 
-## 1. Dataset & Preprocessing
+## ⚙️ How to Run
 
-**Steps:**
+### Step 1: Navigate
+
+    cd question2/scripts
+
+---
+
+### Step 2: Train & Generate Names
+
+#### Vanilla RNN
+
+    python VanillaRNN.py
+
+#### BLSTM
+
+    python BLSTM.py
+
+#### Attention Model
+
+    python attention.py
+
+---
+
+### Step 3: Analyze Results
+
+![Name Analysis](question2/outputs/name_analysis.png)
+
+
+    python name_analysis.py
+
+✔ Generates:
+- `name_analysis.png`
+
+---
+
+### Evaluation Script
+
+    python p2_task2.py
+
+---
+
+## 🧪 Dataset & Processing
+
+- 1000 Indian names  
 - Character-level tokenization  
 - Special tokens:
-  - `<PAD>` = 0  
-  - `<SOS>`  
-  - `<EOS>`  
-
-- Lowercasing → vocabulary size **V = 29**  
-- Created:
-  - `stoi` (string → index)  
-  - `itos` (index → string)  
-
-- Padding:
-  - Used `pad_sequence` for batching  
+  - `<PAD>`, `<SOS>`, `<EOS>`  
+- Vocabulary size: **29**
 
 ---
 
-## 2. Model Architectures
+## 🏗️ Model Summary
 
-### A. Vanilla RNN
+### Vanilla RNN
+- Simple recurrence  
+- Memorization-heavy  
 
-**Logic:**
+### BLSTM
+- Forward + backward context  
+- High capacity → overfitting  
 
-    h_t = tanh(x_t W_ih + b_ih + h_{t-1} W_hh + b_hh)
-
-- Parameters: ~40,477  
-- Role: Baseline memorization model  
-
----
-
-### B. Bidirectional LSTM (BLSTM)
-
-- Custom LSTM cell (Input, Forget, Cell, Output gates)  
-- Forward + backward pass  
-
-**Representation:**
-- 128D forward + 128D backward → 256D  
-
-- Parameters: ~275,357  
-- Role: Captures global structure  
+### Attention GRU
+- Uses attention over past states  
+- Best generalization  
 
 ---
 
-### C. RNN with Causal Attention (GRU + Attention)
-
-- Bahdanau-style additive attention  
-- Computes context vector over past hidden states  
-
-**Sampling Techniques:**
-- Temperature scaling: T = 1.1  
-- Top-K sampling: K = 5  
-
-- Parameters: ~27,518  
-- Role: Phonetic generalization  
-
----
-
-## 3. Quantitative Results
+## 📊 Results
 
 | Model            | Novelty (%) | Diversity |
 |------------------|------------|----------|
@@ -204,63 +232,15 @@ This task implements three recurrent neural architectures from scratch to genera
 
 ---
 
-## 4. Qualitative Observations
+## 🔍 Observations
 
-### Vanilla RNN
-- High realism  
-- Heavy memorization  
-- Behaves like lookup table  
+- Vanilla → memorizes dataset  
+- BLSTM → stuttering issue  
+- Attention → most realistic + novel  
 
-### BLSTM
-- Overfits  
-- "Stuttering" issue  
-  - Example: `aazosnhhaal`  
-
-### Attention GRU
-- Best balance  
-- Generates realistic new names:
-  - `Xavikrat`  
-  - `Bhumakin`  
-
----
-
-## 5. How to Run
-
-### Requirements
-
-- Python 3.10+  
-- PyTorch  
-- NumPy  
-
----
-
-### Run Models
-
-    # Vanilla RNN
-    python vanilla_rnn.py
-
-    # BLSTM
-    python blstm_model.py
-
-    # Attention GRU
-    python attention_gru.py
-
----
-
-### Evaluation
-
-    python p1_task2.py
-
----
-
-## 📂 Problem 2 Structure
-
-    ├── TrainingNames.txt
-    ├── vanilla_rnn.py
-    ├── blstm_model.py
-    ├── attention_gru.py
-    ├── p1_task2.py
-    └── results/
+Example generated names:
+- Xavikrat  
+- Bhumakin  
 
 ---
 
